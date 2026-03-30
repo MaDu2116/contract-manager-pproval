@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  LEGAL_ADMIN
+  MANAGER
+  VIEWER
+}
+
+enum ContractType {
+  SALES
+  SERVICE
+  LABOR
+  LEASE
+  OTHER
+}
+
+enum ContractStatus {
+  DRAFT
+  LEGAL_REVIEW
+  MANAGER_APPROVAL
+  SIGNED
+  EXPIRED
+  CANCELLED
+}
+
+enum ApprovalActionType {
+  SUBMIT
+  APPROVE
+  REJECT
+  CANCEL
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String   @map("password_hash")
+  fullName      String   @map("full_name")
+  role          Role
+  isActive      Boolean  @default(true) @map("is_active")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  createdContracts  Contract[]          @relation("CreatedBy")
+  updatedContracts  Contract[]          @relation("UpdatedBy")
+  approvalActions   ApprovalAction[]
+  uploadedFiles     ContractAttachment[]
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+
+  @@map("users")
+}
+
+model Partner {
+  id           String   @id @default(uuid())
+  name         String
+  taxCode      String?  @map("tax_code")
+  address      String?
+  contactName  String?  @map("contact_name")
+  contactEmail String?  @map("contact_email")
+  contactPhone String?  @map("contact_phone")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  contracts Contract[]
+
+  @@map("partners")
+}
+
+model Contract {
+  id             String         @id @default(uuid())
+  contractNumber String         @unique @map("contract_number")
+  title          String
+  type           ContractType
+  status         ContractStatus @default(DRAFT)
+  partnerId      String         @map("partner_id")
+  value          Decimal        @db.Decimal(15, 2)
+  signingDate    DateTime?      @map("signing_date") @db.Date
+  effectiveDate  DateTime?      @map("effective_date") @db.Date
+  expiryDate     DateTime?      @map("expiry_date") @db.Date
+  description    String?
+  parentId       String?        @map("parent_id")
+  version        Int            @default(1)
+  createdById    String         @map("created_by")
+  updatedById    String         @map("updated_by")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  partner     Partner              @relation(fields: [partnerId], references: [id])
+  parent      Contract?            @relation("ContractVersions", fields: [parentId], references: [id])
+  renewals    Contract[]           @relation("ContractVersions")
+  createdBy   User                 @relation("CreatedBy", fields: [createdById], references: [id])
+  updatedBy   User                 @relation("UpdatedBy", fields: [updatedById], references: [id])
+  attachments ContractAttachment[]
+  approvals   ApprovalAction[]
+  notifications Notification[]
+
+  @@map("contracts")
+}
+
+model ContractAttachment {
+  id         String   @id @default(uuid())
+  contractId String   @map("contract_id")
+  fileName   String   @map("file_name")
+  filePath   String   @map("file_path")
+  fileSize   Int      @map("file_size")
+  mimeType   String   @map("mime_type")
+  uploadedById String @map("uploaded_by")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  contract   Contract @relation(fields: [contractId], references: [id])
+  uploadedBy User     @relation(fields: [uploadedById], references: [id])
+
+  @@map("contract_attachments")
+}
+
+model ApprovalAction {
+  id         String             @id @default(uuid())
+  contractId String             @map("contract_id")
+  fromStatus ContractStatus     @map("from_status")
+  toStatus   ContractStatus     @map("to_status")
+  action     ApprovalActionType
+  comment    String?
+  actedById  String             @map("acted_by")
+  createdAt  DateTime           @default(now()) @map("created_at")
+
+  contract Contract @relation(fields: [contractId], references: [id])
+  actedBy  User     @relation(fields: [actedById], references: [id])
+
+  @@map("approval_actions")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  entityType  String   @map("entity_type")
+  entityId    String   @map("entity_id")
+  action      String
+  changes     Json?
+  performedById String @map("performed_by")
+  ipAddress   String?  @map("ip_address")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  performedBy User @relation(fields: [performedById], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  contractId String?  @map("contract_id")
+  type       String
+  title      String
+  message    String
+  isRead     Boolean  @default(false) @map("is_read")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User      @relation(fields: [userId], references: [id])
+  contract Contract? @relation(fields: [contractId], references: [id])
+
+  @@map("notifications")
+}
