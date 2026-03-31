@@ -7,7 +7,7 @@ echo "Waiting for PostgreSQL to be ready..."
 MAX_RETRIES=30
 RETRY_COUNT=0
 
-until cd server && npx prisma migrate deploy 2>/dev/null; do
+until cd server && npx prisma db push --accept-data-loss 2>/dev/null; do
   RETRY_COUNT=$((RETRY_COUNT + 1))
   if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
     echo "ERROR: PostgreSQL not ready after ${MAX_RETRIES} attempts"
@@ -17,7 +17,7 @@ until cd server && npx prisma migrate deploy 2>/dev/null; do
   sleep 2
 done
 
-echo "Database migrations applied successfully"
+echo "Database schema applied successfully"
 
 # Run seed (optional, only on first run)
 cd /app/server && npx prisma db seed 2>/dev/null || echo "Seed skipped or already applied"

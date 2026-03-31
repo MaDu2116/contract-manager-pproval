@@ -3,12 +3,8 @@ echo ============================================
 echo   Contract Management System
 echo ============================================
 echo.
-echo Pulling latest images...
-docker compose -f docker-compose.prod.yml pull
-
-echo.
-echo Starting services...
-docker compose -f docker-compose.prod.yml up -d
+echo Building and starting services...
+docker compose -f docker-compose.prod.yml up -d --build
 
 echo.
 echo ============================================

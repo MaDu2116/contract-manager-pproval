@@ -34,8 +34,9 @@ COPY package.json ./
 COPY server/package.json ./server/
 
 RUN npm install --workspace=server --production
+RUN cd server && npm install tsx
 
-# Copy Prisma schema and migrations
+# Copy Prisma schema and seed
 COPY server/prisma ./server/prisma/
 
 # Generate Prisma client in production
