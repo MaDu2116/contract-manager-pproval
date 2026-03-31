@@ -3,7 +3,10 @@ echo ============================================
 echo   Contract Management System
 echo ============================================
 echo.
-echo Building and starting services...
+echo Stopping old containers (if any)...
+docker compose -f docker-compose.prod.yml down 2>nul
+echo.
+echo Building and starting services (first run may take 2-3 minutes)...
 docker compose -f docker-compose.prod.yml up -d --build
 
 echo.
