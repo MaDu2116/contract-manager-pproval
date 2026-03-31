@@ -23,7 +23,7 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: env.nodeEnv === 'production' ? true : 'http://localhost:5173',
   credentials: true,
 }));
 app.use(express.json());
@@ -41,10 +41,16 @@ app.use(session({
   cookie: {
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     httpOnly: true,
-    secure: env.nodeEnv === 'production',
+    secure: false,
     sameSite: 'lax',
   },
 }));
+
+// Request logging middleware
+app.use((req, _res, next) => {
+  logger.info(`${req.method} ${req.path}`, { ip: req.ip });
+  next();
+});
 
 // Static files for uploads (requires auth - handled in attachment routes)
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
@@ -69,15 +75,15 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
+// Serve client static files in production
+const clientDistPath = path.join(__dirname, '../../client/dist');
+app.use(express.static(clientDistPath));
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(clientDistPath, 'index.html'));
+});
+
 // Error handler
 app.use(errorHandler);
-
-// Start server
-// Request logging middleware
-app.use((req, _res, next) => {
-  logger.info(`${req.method} ${req.path}`, { ip: req.ip });
-  next();
-});
 
 // Start server
 app.listen(env.port, () => {
