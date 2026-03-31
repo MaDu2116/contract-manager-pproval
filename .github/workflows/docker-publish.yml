@@ -23,5 +23,5 @@ jobs:
           context: .
           push: true
           tags: |
-            madu2116/contract-manager:latest
-            madu2116/contract-manager:${{ github.sha }}
+            maduduma/contract-manager:latest
+            maduduma/contract-manager:${{ github.sha }}
