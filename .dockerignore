@@ -1,0 +1,11 @@
+node_modules
+.git
+*.md
+docs
+AI-Log
+coverage
+server/dist
+server/coverage
+client/dist
+.github
+server/src/__tests__

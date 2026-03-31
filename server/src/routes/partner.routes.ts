@@ -10,7 +10,7 @@ partnerRoutes.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const result = await partnerService.listPartners(req.query as Record<string, string>);
     res.json(result);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -20,7 +20,7 @@ partnerRoutes.get('/:id', requireAuth, async (req: Request, res: Response) => {
     const partner = await partnerService.getPartnerById(req.params.id);
     if (!partner) return res.status(404).json({ error: 'Đối tác không tồn tại' });
     res.json(partner);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

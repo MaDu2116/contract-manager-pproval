@@ -8,7 +8,7 @@ userRoutes.get('/', requireAuth, requireRole('MANAGER'), async (req: Request, re
   try {
     const result = await userService.listUsers(req.query as Record<string, string>);
     res.json(result);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

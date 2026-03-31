@@ -28,9 +28,9 @@ export default function ContractInfo({ contract }: Props) {
       <Descriptions.Item label="Ngày hiệu lực">{formatDate(contract.effectiveDate as string)}</Descriptions.Item>
       <Descriptions.Item label="Ngày hết hạn">{formatDate(contract.expiryDate as string)}</Descriptions.Item>
       <Descriptions.Item label="Người tạo">{createdBy?.fullName}</Descriptions.Item>
-      {contract.description && (
+      {contract.description ? (
         <Descriptions.Item label="Mô tả" span={2}>{contract.description as string}</Descriptions.Item>
-      )}
+      ) : null}
     </Descriptions>
   );
 }

@@ -45,7 +45,7 @@ export default function PartnerListPage() {
         columns={columns}
         rowKey="id"
         loading={isLoading}
-        onRow={(record) => ({
+        onRow={(record: Record<string, unknown>) => ({
           onClick: () => navigate(`/partners/${record.id}/edit`),
           style: { cursor: 'pointer' },
         })}

@@ -16,7 +16,7 @@ authRoutes.post('/login', validate(loginSchema), async (req: Request, res: Respo
     req.session.userId = user.id;
     req.session.userRole = user.role;
     res.json({ user });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -34,7 +34,7 @@ authRoutes.get('/me', requireAuth, async (req: Request, res: Response) => {
     const user = await getUserById(req.session.userId!);
     if (!user) return res.status(404).json({ error: 'Người dùng không tồn tại' });
     res.json({ user });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

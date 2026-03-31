@@ -11,11 +11,11 @@ describe('Logger', () => {
     consoleSpy?.mockRestore();
   });
 
-  it('should log INFO messages in development', () => {
+  it('should log INFO messages in development', async () => {
     process.env.NODE_ENV = 'development';
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
-    const { logger } = require('../../utils/logger');
+    const { logger } = await import('../../utils/logger');
     logger.info('Test message', { key: 'value' });
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -23,11 +23,11 @@ describe('Logger', () => {
     );
   });
 
-  it('should log WARN messages', () => {
+  it('should log WARN messages', async () => {
     process.env.NODE_ENV = 'development';
     consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
-    const { logger } = require('../../utils/logger');
+    const { logger } = await import('../../utils/logger');
     logger.warn('Warning message');
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -35,11 +35,11 @@ describe('Logger', () => {
     );
   });
 
-  it('should log ERROR messages', () => {
+  it('should log ERROR messages', async () => {
     process.env.NODE_ENV = 'development';
     consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-    const { logger } = require('../../utils/logger');
+    const { logger } = await import('../../utils/logger');
     logger.error('Error message', { error: 'details' });
 
     expect(consoleSpy).toHaveBeenCalledWith(
@@ -47,11 +47,11 @@ describe('Logger', () => {
     );
   });
 
-  it('should log JSON in production', () => {
+  it('should log JSON in production', async () => {
     process.env.NODE_ENV = 'production';
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
-    const { logger } = require('../../utils/logger');
+    const { logger } = await import('../../utils/logger');
     logger.info('Production log', { userId: '123' });
 
     const loggedStr = consoleSpy.mock.calls[0][0];

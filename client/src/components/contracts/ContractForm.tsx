@@ -69,7 +69,7 @@ export default function ContractForm({ initialValues, onSubmit, loading }: Props
           style={{ width: '100%' }}
           min={0}
           formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-          parser={(value) => Number(value!.replace(/,/g, ''))}
+          parser={(value) => Number(value!.replace(/,/g, '')) as unknown as 0}
           placeholder="Nhập giá trị hợp đồng"
         />
       </Form.Item>
