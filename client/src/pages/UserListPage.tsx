@@ -59,7 +59,7 @@ export default function UserListPage() {
         columns={columns}
         rowKey="id"
         loading={isLoading}
-        onRow={(record) => ({
+        onRow={(record: Record<string, unknown>) => ({
           onClick: () => navigate(`/users/${record.id}/edit`),
           style: { cursor: 'pointer' },
         })}
