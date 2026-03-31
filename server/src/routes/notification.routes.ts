@@ -11,7 +11,7 @@ notificationRoutes.get('/', requireAuth, async (req: Request, res: Response) => 
       req.query as Record<string, string>,
     );
     res.json(result);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -20,7 +20,7 @@ notificationRoutes.get('/unread-count', requireAuth, async (req: Request, res: R
   try {
     const count = await notificationService.getUnreadCount(req.session.userId!);
     res.json({ count });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -29,7 +29,7 @@ notificationRoutes.patch('/:id/read', requireAuth, async (req: Request, res: Res
   try {
     await notificationService.markAsRead(req.params.id, req.session.userId!);
     res.json({ message: 'Đã đánh dấu đã đọc' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -38,7 +38,7 @@ notificationRoutes.patch('/read-all', requireAuth, async (req: Request, res: Res
   try {
     await notificationService.markAllAsRead(req.session.userId!);
     res.json({ message: 'Đã đánh dấu tất cả đã đọc' });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

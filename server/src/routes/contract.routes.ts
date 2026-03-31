@@ -14,7 +14,7 @@ contractRoutes.get('/', requireAuth, async (req: Request, res: Response) => {
   try {
     const result = await contractService.listContracts(req.query as Record<string, string>);
     res.json(result);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -25,7 +25,7 @@ contractRoutes.get('/:id', requireAuth, async (req: Request, res: Response) => {
     const contract = await contractService.getContractById(req.params.id);
     if (!contract) return res.status(404).json({ error: 'Hợp đồng không tồn tại' });
     res.json(contract);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -122,7 +122,7 @@ contractRoutes.get('/:id/attachments', requireAuth, async (req: Request, res: Re
   try {
     const attachments = await attachmentService.getAttachments(req.params.id);
     res.json(attachments);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -152,7 +152,7 @@ contractRoutes.get('/:id/history', requireAuth, async (req: Request, res: Respon
   try {
     const history = await contractService.getContractHistory(req.params.id);
     res.json(history);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

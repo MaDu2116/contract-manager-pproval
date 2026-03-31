@@ -1,5 +1,4 @@
 import fs from 'fs';
-import path from 'path';
 
 const mockCreate = jest.fn();
 const mockFindUnique = jest.fn();

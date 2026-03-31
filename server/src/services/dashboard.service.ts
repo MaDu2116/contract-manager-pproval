@@ -53,8 +53,6 @@ export async function getByStatus() {
 
 export async function getExpiring() {
   const now = new Date();
-  const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-  const in60 = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000);
   const in90 = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
 
   const contracts = await prisma.contract.findMany({

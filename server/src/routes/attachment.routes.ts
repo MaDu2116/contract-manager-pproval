@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import path from 'path';
 import { requireAuth, requireRole } from '../middleware/auth';
-import { upload } from '../middleware/upload';
+
 import * as attachmentService from '../services/attachment.service';
 
 export const attachmentRoutes = Router();
@@ -14,7 +14,7 @@ attachmentRoutes.get('/:id/download', requireAuth, async (req: Request, res: Res
 
     const filePath = path.join(__dirname, '../../../uploads', attachment.filePath);
     res.download(filePath, attachment.fileName);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });
@@ -29,7 +29,7 @@ attachmentRoutes.get('/:id/view', requireAuth, async (req: Request, res: Respons
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename="${attachment.fileName}"`);
     res.sendFile(filePath);
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: 'Lỗi hệ thống' });
   }
 });

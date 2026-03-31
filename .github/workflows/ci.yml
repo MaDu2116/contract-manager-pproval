@@ -49,7 +49,7 @@ jobs:
         run: cd server && npx prisma migrate deploy
 
       - name: Lint server
-        run: cd server && npm run lint || true
+        run: cd server && npm run lint
 
       - name: Build server
         run: cd server && npm run build
