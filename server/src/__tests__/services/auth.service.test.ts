@@ -1,6 +1,8 @@
-import bcrypt from 'bcrypt';
+const mockCompare = jest.fn();
+jest.mock('bcrypt', () => ({
+  compare: (...args: unknown[]) => mockCompare(...args),
+}));
 
-// Mock prisma
 const mockFindUnique = jest.fn();
 jest.mock('../../index', () => ({
   prisma: {
@@ -17,21 +19,21 @@ describe('AuthService', () => {
     jest.clearAllMocks();
   });
 
-  describe('authenticateUser', () => {
-    const mockUser = {
-      id: 'user-1',
-      email: 'test@company.com',
-      passwordHash: '',
-      fullName: 'Test User',
-      role: 'LEGAL_ADMIN',
-      isActive: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+  const mockUser = {
+    id: 'user-1',
+    email: 'test@company.com',
+    passwordHash: 'hashed_password',
+    fullName: 'Test User',
+    role: 'LEGAL_ADMIN',
+    isActive: true,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
+  describe('authenticateUser', () => {
     it('should return user without password on valid credentials', async () => {
-      const hash = await bcrypt.hash('password123', 10);
-      mockFindUnique.mockResolvedValue({ ...mockUser, passwordHash: hash });
+      mockFindUnique.mockResolvedValue(mockUser);
+      mockCompare.mockResolvedValue(true);
 
       const result = await authenticateUser('test@company.com', 'password123');
 
@@ -42,8 +44,8 @@ describe('AuthService', () => {
     });
 
     it('should return null for wrong password', async () => {
-      const hash = await bcrypt.hash('password123', 10);
-      mockFindUnique.mockResolvedValue({ ...mockUser, passwordHash: hash });
+      mockFindUnique.mockResolvedValue(mockUser);
+      mockCompare.mockResolvedValue(false);
 
       const result = await authenticateUser('test@company.com', 'wrongpassword');
 
@@ -59,27 +61,18 @@ describe('AuthService', () => {
     });
 
     it('should return null for inactive user', async () => {
-      const hash = await bcrypt.hash('password123', 10);
-      mockFindUnique.mockResolvedValue({ ...mockUser, passwordHash: hash, isActive: false });
+      mockFindUnique.mockResolvedValue({ ...mockUser, isActive: false });
 
       const result = await authenticateUser('test@company.com', 'password123');
 
       expect(result).toBeNull();
+      expect(mockCompare).not.toHaveBeenCalled();
     });
   });
 
   describe('getUserById', () => {
     it('should return user without password', async () => {
-      mockFindUnique.mockResolvedValue({
-        id: 'user-1',
-        email: 'test@company.com',
-        passwordHash: 'hash',
-        fullName: 'Test User',
-        role: 'MANAGER',
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      mockFindUnique.mockResolvedValue(mockUser);
 
       const result = await getUserById('user-1');
 
