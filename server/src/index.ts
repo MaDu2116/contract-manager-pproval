@@ -76,11 +76,15 @@ app.get('/api/health', async (_req, res) => {
 });
 
 // Serve client static files in production
-const clientDistPath = path.join(__dirname, '../../client/dist');
-app.use(express.static(clientDistPath));
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(clientDistPath, 'index.html'));
-});
+if (env.nodeEnv === 'production') {
+  const clientDistPath = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientDistPath));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'), (err) => {
+      if (err) res.status(500).send('Client build not found');
+    });
+  });
+}
 
 // Error handler
 app.use(errorHandler);
