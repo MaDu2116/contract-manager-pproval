@@ -2,6 +2,7 @@ import express from 'express';
 import session from 'express-session';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
 import connectPgSimple from 'connect-pg-simple';
 import { env } from './config/env';
@@ -52,10 +53,10 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Static files for uploads (requires auth - handled in attachment routes)
+// Static files for uploads
 app.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
 
-// Routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/contracts', contractRoutes);
 app.use('/api/partners', partnerRoutes);
@@ -65,7 +66,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/export', exportRoutes);
 
-// Health check with DB status
+// Health check
 app.get('/api/health', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
@@ -75,15 +76,20 @@ app.get('/api/health', async (_req, res) => {
   }
 });
 
-// Serve client static files in production
-if (env.nodeEnv === 'production') {
-  const clientDistPath = path.join(__dirname, '../../client/dist');
+// Serve client static files (SPA)
+const clientDistPath = path.resolve(__dirname, '..', '..', 'client', 'dist');
+const clientIndexPath = path.join(clientDistPath, 'index.html');
+logger.info(`Client dist path: ${clientDistPath}`);
+logger.info(`Client index.html exists: ${fs.existsSync(clientIndexPath)}`);
+
+if (fs.existsSync(clientDistPath)) {
   app.use(express.static(clientDistPath));
   app.get('*', (_req, res) => {
-    res.sendFile(path.join(clientDistPath, 'index.html'), (err) => {
-      if (err) res.status(500).send('Client build not found');
-    });
+    res.sendFile(clientIndexPath);
   });
+  logger.info('SPA static file serving enabled');
+} else {
+  logger.warn(`Client dist not found at ${clientDistPath} - SPA serving disabled`);
 }
 
 // Error handler
@@ -92,6 +98,9 @@ app.use(errorHandler);
 // Start server
 app.listen(env.port, () => {
   logger.info(`Server running on port ${env.port}`);
+  logger.info(`NODE_ENV: ${env.nodeEnv}`);
+  logger.info(`__dirname: ${__dirname}`);
+  logger.info(`CWD: ${process.cwd()}`);
   startExpiryCheckJob();
 });
 
