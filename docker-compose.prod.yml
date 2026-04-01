@@ -17,7 +17,7 @@ services:
       retries: 10
 
   app:
-    build: .
+    image: maduduma/contract-manager:latest
     container_name: contract_manager_app
     ports:
       - "3001:3001"

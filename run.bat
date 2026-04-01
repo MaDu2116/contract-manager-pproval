@@ -6,8 +6,11 @@ echo.
 echo Stopping old containers (if any)...
 docker compose -f docker-compose.prod.yml down 2>nul
 echo.
-echo Building and starting services (first run may take 2-3 minutes)...
-docker compose -f docker-compose.prod.yml up -d --build
+echo Pulling latest images...
+docker compose -f docker-compose.prod.yml pull
+echo.
+echo Starting services...
+docker compose -f docker-compose.prod.yml up -d
 
 echo.
 echo ============================================
